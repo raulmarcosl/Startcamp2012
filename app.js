@@ -32,7 +32,8 @@ app.configure('development', function(){
 
 var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
-mongoose.connect('localhost', 'startcamp2012');
+// mongoose.connect('localhost', 'startcamp2012');
+mongoose.connect('mongodb://admin:admin@dharma.mongohq.com:10034/startcamp2012');
 var db = mongoose.connection;
 db.on('error', console.error.bind(console, "Connection error: "));
 
