@@ -5,6 +5,7 @@
 
 var express = require('express')
   , routes = require('./routes')
+  , index = require('./routes/index')
   , http = require('http')
   , path = require('path');
 
@@ -67,6 +68,9 @@ var feedSchema = new Schema({
     score: { type: Number, default: null }
 });
 var Feed = mongoose.model('Feed', feedSchema);
+
+
+app.get('/', index.index);
 
 
 app.get('/api/user', function (req, res) {
