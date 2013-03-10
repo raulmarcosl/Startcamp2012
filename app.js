@@ -7,6 +7,7 @@ var express = require('express')
   , routes = require('./routes')
   , index = require('./routes/index')
   , http = require('http')
+  , feedparser = require('feedparser')
   , path = require('path');
 
 var app = express();
@@ -58,13 +59,12 @@ var userSchema = new Schema({
 });
 var User = mongoose.model('User', userSchema);
 
+
 var feedSchema = new Schema({
     title: { type: String, required: true },
-    content: { type: String, required: true },
-    photo: { type: String, default: null },
-    photoUrl: { type: String, default: null },
+    content: { type: String, default: null },
     permalink: { type: String, required: true },
-    pubDate: { type: Number, required: true },
+    pubDate: { type: String, default: null },
     tags: [{ type: String, default: null }],
     score: { type: Number, default: null }
 });
@@ -72,17 +72,6 @@ var Feed = mongoose.model('Feed', feedSchema);
 
 
 app.get('/', index.index);
-
-
-app.get('/feedparser', function (req, res) {
-    var feedparser = require('feedparser');
-
-    feedparser.parseUrl('http://news.ycombinator.com/rss')
-
-    .on('article', function(article){
-        res.send(article);
-    });
-});
 
 
 app.get('/api/user', function (req, res) {
@@ -156,43 +145,42 @@ app.get('/api/feed/:id', function (req, res) {
 });
 
 app.post('/api/feed', function (req, res) {
-    newFeed = createFeed(req.body.url);
+    // newFeed = createFeed(req.body.url);
 
-    newFeed.save (function (err) {
-        if (err) {
-            res.send("Error on /api/feed (POST). MongoDB error.", 400);
-        } else {
-            res.send(newFeed, 200);
-        }
+    // newFeed.save (function (err) {
+    //     if (err) {
+    //         res.send("Error on /api/feed (POST). MongoDB error.", 400);
+    //     } else {
+    //         res.send(newFeed, 200);
+    //     }
+    // });
+
+
+
+    feedparser.parseUrl(req.body.url)
+    .on('article', function(article){
+        console.log(article);
+        
+        var title = article.title;
+        var permalink = article.link;
+
+        newFeed = new Feed({
+            title: title,
+            permalink: permalink,
+        });
+
+        newFeed.save (function (err) {
+            if (err) {
+                res.send(err, 400);
+            } else {
+                console.log("Feed saved");
+            }
+        });
     });
 });
 
-function createFeed(url) {
-    var title = "NBA-feed2";
-    var content = "Lorem ipsum dolor lorem ipsum dolor";
-    var photo = "NBA-feed1.png";
-    var photoUrl = "./public/images/NBA-feed1.png";
-    var permalink = url;
-    var pubDate = 12345789;
-    var tags = null;
-    var score;
-
-
-    feed = new Feed({
-        title: title,
-        content: content,
-        photo: photo,
-        photoUrl: photoUrl,
-        permalink: permalink,
-        pubDate: pubDate,
-        tags: tags,
-        score: score
-    });
-
-    return feed;
-}
 
 
 http.createServer(app).listen(app.get('port'), function(){
-  console.log("Express server listening on port " + app.get('port'));
+    console.log("Express server listening on port " + app.get('port'));
 });
