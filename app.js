@@ -50,7 +50,7 @@ var userSchema = new Schema({
         ref: 'Feed',
         default: null
     }],
-    favorited: [{
+    favorites: [{
         type: Schema.Types.ObjectId,
         ref: 'Feed',
         default: null
@@ -145,12 +145,7 @@ app.get('/api/feed/:id', function (req, res) {
 });
 
 app.post('/api/feed', function (req, res) {
-    newFeed = new Feed({
-        title: req.body.title,
-        content: req.body.content,
-        permalink: req.body.permalink,
-        pubDate: req.body.pubDate
-    });
+    newFeed = createFeed(req.body.url);
 
     newFeed.save (function (err) {
         if (err) {
@@ -160,6 +155,31 @@ app.post('/api/feed', function (req, res) {
         }
     });
 });
+
+function createFeed(url) {
+    var title = "NBA-feed2";
+    var content = "Lorem ipsum dolor lorem ipsum dolor";
+    var photo = "NBA-feed1.png";
+    var photoUrl = "./public/images/NBA-feed1.png";
+    var permalink = url;
+    var pubDate = 12345789;
+    var tags = null;
+    var score;
+
+
+    feed = new Feed({
+        title: title,
+        content: content,
+        photo: photo,
+        photoUrl: photoUrl,
+        permalink: permalink,
+        pubDate: pubDate,
+        tags: tags,
+        score: score
+    });
+
+    return feed;
+}
 
 
 http.createServer(app).listen(app.get('port'), function(){
