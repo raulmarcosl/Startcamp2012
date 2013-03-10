@@ -13,6 +13,7 @@
     "express": ">=2.2.0",
     "jade": "*",
     "mongodb": "*",
-    "mongoose": "*"
+    "mongoose": "*",
+    "feedparser": "*"
   }
 }

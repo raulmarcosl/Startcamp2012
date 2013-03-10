@@ -74,6 +74,17 @@ var Feed = mongoose.model('Feed', feedSchema);
 app.get('/', index.index);
 
 
+app.get('/feedparser', function (req, res) {
+    var feedparser = require('feedparser');
+
+    feedparser.parseUrl('http://news.ycombinator.com/rss')
+
+    .on('article', function(article){
+        res.send(article);
+    });
+});
+
+
 app.get('/api/user', function (req, res) {
     User.find({}, function (err, users) {        
         if (err) {
